@@ -2,14 +2,14 @@ package twfy
 
 type (
 	jsonMPsResponse []Member
-	jsonResponse struct{
+	jsonResponse    struct {
 		Error Error
 	}
-	jsonHansard struct{
+	jsonHansard struct {
 		Rows []jsonRow `json:"row"`
 	}
 
-	jsonRow struct{
+	jsonRow struct {
 		Body string `json:"body"`
 	}
 )

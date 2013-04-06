@@ -2,17 +2,17 @@ package database
 
 //On init, reload all members
 import (
+	D "github.com/TShadwell/nhtgd2013/database"
 	"github.com/TShadwell/nhtgd2013/secrets"
 	"github.com/TShadwell/nhtgd2013/twfy"
 	"log"
-	D "github.com/TShadwell/nhtgd2013/database"
 )
 
-func init(){
+func init() {
 
-	database, err :=  D.Init()
+	database, err := D.Init()
 
-	if err != nil{
+	if err != nil {
 		log.Fatal("Error binding database: ", err)
 	}
 
@@ -22,7 +22,7 @@ func init(){
 
 	ms, err := API.GetMembers()
 
-	if err != nil{
+	if err != nil {
 		log.Fatal("Error getting members: ", err)
 	}
 
