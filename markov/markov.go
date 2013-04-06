@@ -8,12 +8,13 @@
 		fmt.Println(text)             // Write text to standard output.
 */
 package markov
+
 import (
 	"bufio"
-	"io"
-	"strings"
-	"math/rand"
 	"fmt"
+	"io"
+	"math/rand"
+	"strings"
 )
 
 // Prefix is a Markov chain prefix of one or more words.
@@ -25,12 +26,12 @@ func (p prefix) String() string {
 }
 
 // Shift removes the first word from the Prefix and appends the given word.
-func (p prefix) Shift(word string) {
+func (p prefix) shift(word string) {
 	copy(p, p[1:])
 	p[len(p)-1] = word
 }
 
-// Chain contains a map ("chain") of prefixes to a list of suffixes.
+// Chain contains a map - the "chain" of prefixes to a list of suffixes.
 // A prefix is a string of prefixLen words joined with spaces.
 // A suffix is a single word. A prefix can have multiple suffixes.
 type Chain struct {
@@ -55,7 +56,7 @@ func (c *Chain) Build(r io.Reader) {
 		}
 		key := p.String()
 		c.chain[key] = append(c.chain[key], s)
-		p.Shift(s)
+		p.shift(s)
 	}
 }
 
@@ -70,7 +71,7 @@ func (c *Chain) Generate(n int) string {
 		}
 		next := choices[rand.Intn(len(choices))]
 		words = append(words, next)
-		p.Shift(next)
+		p.shift(next)
 	}
 	return strings.Join(words, " ")
 }

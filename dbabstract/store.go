@@ -6,6 +6,7 @@ import (
 	"encoding/gob"
 	D "github.com/TShadwell/nhtgd2013/database"
 	"github.com/TShadwell/nhtgd2013/twfy"
+	"github.com/TShadwell/nhtgd2013/markov"
 )
 
 var database *D.Database
@@ -20,7 +21,7 @@ type (
 
 const (
 	members dbIndex = iota
-	names
+	chains
 )
 
 /*
@@ -89,4 +90,36 @@ func storeMembers(ms []twfy.Member) (err error) {
 	}
 
 	return writeGobToKey(key, ms)
+}
+
+/*
+	StoreChain stores a markov chain corresponding
+	to a member in our K/V store.
+*/
+func StoreChain(m markov.Chain, p twfy.PersonID) (err error){
+	key, err := dbKey(
+		chains,
+		p,
+	)
+	if err != nil{
+		return err
+	}
+	return writeGobToKey(key, m)
+}
+
+/*
+	Retrieves a stored markov chain from the database.
+*/
+func RetrieveChain(p twfy.PersonID) (m markov.Chain, err error) {
+	key, err := dbKey(
+		chains,
+		p,
+	)
+
+	if err != nil{
+		return
+	}
+
+	err = readGobFromKey(key, &m)
+	return
 }
