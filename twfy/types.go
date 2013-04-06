@@ -25,7 +25,7 @@ type (
 	Party string
 	Constituency string
 
-	Person struct {
+	Member struct {
 		MemberID  MemberID `json:"member_id"`
 		PersonID PersonID `json:"person_id"`
 

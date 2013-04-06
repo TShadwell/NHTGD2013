@@ -1,6 +1,6 @@
 package twfy
 
 type (
-	jsonMPsResponse []Person
+	jsonMPsResponse []Member
 
 )
