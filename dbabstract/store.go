@@ -3,22 +3,15 @@ package database
 import (
 	"encoding/gob"
 	"encoding/binary"
-	"bufio"
 	"log"
+	"bytes"
 	"github.com/TShadwell/nhtgd2013/twfy"
 	D "github.com/TShadwell/nhtgd2013/database"
 )
 
-var database = mustDatabase(d.Init())
+var database *D.Database
 
-func mustDatabase(d *D.Database, e error) {
-	if err != nil{
-		log.Fatal("Error binding database: ", e)
-	}
-	return d
-}
-
-const (
+var (
 	byteorder = binary.LittleEndian
 )
 
@@ -37,10 +30,10 @@ const (
 	which is returned for use as a DB key.
 */
 func dbKey(d dbIndex, i ...interface{}) (k D.Key, err error){
-	buf := new(bytes.Buffer)
+	var buf bytes.Buffer
 
 	for _, v := range i {
-		err = binary.Write(buf, byteorder,  v)
+		err = binary.Write(&buf, byteorder,  v)
 		if err != nil{
 			return
 		}
@@ -63,15 +56,22 @@ func getFromKey(k D.Key, err error) (D.Value, error){
 }
 
 func readGobFromKey(k D.Key, i interface{}) error{
-	b, e := getFromKey(k, err)
+	b, e := getFromKey(k, nil)
 	if e != nil{
 		return e
 	}
 	return gob.NewDecoder(bytes.NewBuffer(b)).Decode(i)
 }
 
-func writeGobToKey(k D.Key, i interface{}) error{
-	
+func writeGobToKey(k D.Key, i interface{}) (err error){
+	var buf bytes.Buffer
+	err = gob.NewEncoder(&buf).Encode(i)
+	if err != nil{
+		return
+	}
+	err = database.Put(k, buf.Bytes())
+	return
+
 }
 
 func GetMembers() (mems []twfy.Member, err error){
@@ -83,6 +83,11 @@ func GetMembers() (mems []twfy.Member, err error){
 	return
 }
 
-func StoreMembers([]twfy.Member) error {
-	
+func storeMembers(ms []twfy.Member) (err error){
+	key, err := dbKey(members)
+	if err != nil{
+		return
+	}
+
+	return writeGobToKey(key, ms)
 }
