@@ -5,11 +5,11 @@ type (
 	jsonResponse    struct {
 		Error Error
 	}
-	jsonHansard struct {
-		Rows []jsonRow `json:"row"`
+	JsonHansard struct{
+		Rows []JsonRow `json:"rows"`
 	}
 
-	jsonRow struct {
+	JsonRow struct {
 		Body string `json:"body"`
 	}
 )

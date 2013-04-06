@@ -44,9 +44,6 @@ func dbKey(d dbIndex, i ...interface{}) (k D.Key, err error) {
 	return
 }
 
-/*
-
-*/
 func getFromKey(k D.Key, err error) (D.Value, error) {
 	if err != nil {
 		return nil, err
@@ -59,6 +56,10 @@ func readGobFromKey(k D.Key, i interface{}) error {
 	b, e := getFromKey(k, nil)
 	if e != nil {
 		return e
+	}
+
+	if b == nil{
+		return nil
 	}
 	return gob.NewDecoder(bytes.NewBuffer(b)).Decode(i)
 }
@@ -109,8 +110,9 @@ func StoreChain(m markov.Chain, p twfy.PersonID) (err error){
 
 /*
 	Retrieves a stored markov chain from the database.
+	A nil chain is returned if it does not exist.
 */
-func RetrieveChain(p twfy.PersonID) (m markov.Chain, err error) {
+func RetrieveChain(p twfy.PersonID) (m *markov.Chain, err error) {
 	key, err := dbKey(
 		chains,
 		p,

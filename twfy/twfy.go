@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html"
 	"io/ioutil"
+	"strings"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -13,13 +14,15 @@ import (
 var tagRemover = regexp.MustCompile("<[^>]*>")
 
 func (a *API) get(endpoint string, args url.Values) (bytes []byte, err error) {
-	args.Add("output", "js")
+	args.Add("output", "/js")
 	args.Add("key", string(a.Key))
 	resp, err := http.Get(
 		"http://www.theyworkforyou.com/api/" +
 			endpoint + "?" +
 			args.Encode(),
 	)
+
+	fmt.Println("Args: ", args.Encode())
 
 	if err != nil {
 		return
@@ -29,23 +32,24 @@ func (a *API) get(endpoint string, args url.Values) (bytes []byte, err error) {
 		resp.Body,
 	)
 
-	var errTest jsonResponse
+	//var errTest jsonResponse
 
 	//Check for errors before we go
-	err = json.Unmarshal(bytes, &errTest)
+	//err = json.Unmarshal(bytes, &errTest)
+	/*
 	if err != nil {
 		return
 	}
+	*/
 
 	//Got TWFY error.
-	if errTest.Error != "" {
+	/*if errTest.Error != "" {
 		err = errTest.Error
-	}
+	}*/
 
 	return
 }
 
-//func (a *API) GetMPById(i PersonID)
 /*
 	Created specifically for RobotMP
 */
@@ -57,15 +61,26 @@ func (a *API) GetTexts(p PersonID) (op []string, err error) {
 				fmt.Sprint(p),
 			},
 			"num": {
-				"1000",
+				"450",
 			},
 		},
 	)
 
-	var marshalled jsonHansard
+	if err != nil{
+		return
+	}
+
+	var marshalled JsonHansard
 	err = json.Unmarshal(bytes, &marshalled)
+	if err != nil{
+		return
+	}
+	fmt.Println(marshalled)
 	for _, v := range marshalled.Rows {
-		op = append(op, sanitiseTexts(v.Body))
+		t := sanitiseTexts(v.Body)
+		if !strings.HasPrefix(t, "To"){
+			op = append(op, t)
+		}
 	}
 	return
 }
@@ -103,4 +118,3 @@ func (a *API) GetMpsForParty(p Party) (ms []Member, err error) {
 	return
 
 }
-func (a *API) GetMPById(i PersonID)
