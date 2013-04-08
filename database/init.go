@@ -2,9 +2,10 @@ package database
 
 import (
 	"bitbucket.org/kardianos/osext"
+	"fmt"
 	"github.com/TShadwell/go-useful/errors"
-	"os"
 	"github.com/jmhodges/levigo"
+	"os"
 )
 
 const (
@@ -12,13 +13,14 @@ const (
 	writeBuffer = 100 * Megabyte
 )
 
-func (d *Database) Destroy () error {
+func (d *Database) Destroy() error {
 	return os.Remove(d.Location)
 }
 
 func Init() (*Database, error) {
 	path, err := osext.ExecutableFolder()
-	location := path + "database"
+	location := path + "/leveldb/"
+	fmt.Println("[DATABASE] Bound to location: " + location)
 	if err != nil {
 		return nil, errors.Extend(err)
 	}
@@ -27,7 +29,7 @@ func Init() (*Database, error) {
 	cache := levigo.NewLRUCache(300 * Megabyte)
 	opts.SetCache(cache)
 	opts.SetWriteBufferSize(writeBuffer)
-	db, err := levigo.Open(path, opts)
+	db, err := levigo.Open(location, opts)
 	if err != nil {
 		return nil, errors.Extend(err)
 	}
@@ -37,6 +39,6 @@ func Init() (*Database, error) {
 		Options:      opts,
 		ReadOptions:  levigo.NewReadOptions(),
 		WriteOptions: levigo.NewWriteOptions(),
-		Location:         location,
+		Location:     location,
 	}, nil
 }

@@ -2,7 +2,7 @@ package database
 
 //On init, reload all members
 import (
-	D "github.com/TShadwell/nhtgd2013/database"
+	D "github.com/TShadwell/NHTGD2013/database"
 	"log"
 )
 
@@ -15,17 +15,17 @@ func init() {
 		log.Fatal("Error binding database: ", err)
 	}
 	/*
-	API := twfy.API{
-		Key: secrets.TWFYKey,
-	}
+		API := twfy.API{
+			Key: secrets.TWFYKey,
+		}
 
-	ms, err := API.GetMembers()
+		ms, err := API.GetMembers()
 
-	if err != nil {
-		log.Fatal("Error getting members: ", err)
-	}
+		if err != nil {
+			log.Fatal("Error getting members: ", err)
+		}
 
-	err = storeMembers(ms)
-	log.Println("Members stored.")
+		err = storeMembers(ms)
+		log.Println("Members stored.")
 	*/
 }
