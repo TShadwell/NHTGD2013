@@ -1,5 +1,5 @@
 package secrets
 
 const (
-	TWFYKey = 
+	TWFYKey = "DiEfMMDNP6g6EGaNC4AN4Lwb"
 )
