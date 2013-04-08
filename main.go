@@ -12,7 +12,6 @@ import (
 	"time"
 )
 
-
 const numwords = 300
 
 func main() {
@@ -59,7 +58,7 @@ func MarkovMP(w http.ResponseWriter, r *http.Request) {
 
 	//var m *markov.Chain
 
-	if err != nil{
+	if err != nil {
 		fmt.Fprint(w, "Error reading from database.")
 		log.Println(err)
 		return
@@ -74,7 +73,6 @@ func MarkovMP(w http.ResponseWriter, r *http.Request) {
 			pid,
 		)
 
-
 		if err != nil {
 			fmt.Fprint(w, "Error getting twfy")
 			log.Println(err)
@@ -87,7 +85,7 @@ func MarkovMP(w http.ResponseWriter, r *http.Request) {
 			pid,
 		)
 
-		if err != nil{
+		if err != nil {
 			fmt.Fprint(w, "Error storing chain in database.")
 			log.Println(err)
 		}
