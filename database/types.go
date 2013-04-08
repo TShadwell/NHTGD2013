@@ -11,6 +11,7 @@ type (
 		Options *levigo.Options
 		*levigo.ReadOptions
 		*levigo.WriteOptions
+		Location string
 	}
 	/*
 		A set of atomic writes and deletions;
