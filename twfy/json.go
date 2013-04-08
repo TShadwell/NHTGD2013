@@ -5,7 +5,7 @@ type (
 	jsonResponse    struct {
 		Error Error
 	}
-	JsonHansard struct{
+	JsonHansard struct {
 		Rows []JsonRow `json:"rows"`
 	}
 

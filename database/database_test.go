@@ -1,46 +1,52 @@
 package database
 
 import (
-	"testing"
 	"bytes"
 	"github.com/TShadwell/go-useful/errors"
+	"testing"
 )
 
 var (
-	keyone = []byte("Alpha")
-	keytwo = []byte("Beta")
+	keyone   = []byte("Alpha")
+	keytwo   = []byte("Beta")
 	valueone = []byte("x")
 	valuetwo = []byte("y")
 )
 
 func TestDatabase(t *testing.T) {
 	db, err := Init()
-	if err != nil{
+	if err != nil {
 		t.Fatal("Error whilst loading DB: ", errors.Extend(err))
 	}
 
-	err = db.Commit(
-		new(Atom).Put(
-			keyone,
-			valueone,
-		).Put(
-			keytwo,
-			valuetwo,
-		),
+	writeAtom := new(Atom).Put(
+		keyone,
+		valueone,
+	).Put(
+		keytwo,
+		valuetwo,
 	)
 
-	if err != nil{
+	err = db.Commit(
+		writeAtom,
+	)
+
+	if err != nil {
 		t.Fatal("Error performing atomic DB write: ", errors.Extend(err))
 	}
+
+	t.Log("Atom written: ", writeAtom)
 
 	v, err := db.Get(
 		keyone,
 	)
-	if err != nil{
+	if err != nil {
 		t.Fatal("Error retrieving key one: ", errors.Extend(err))
 	}
 
-	if !bytes.Equal(v, valueone){
+	t.Log("Retrieved value: ", string(v))
+
+	if !bytes.Equal(v, valueone) {
 		t.Fatal("Values stored and retrived are not the same!")
 	}
 

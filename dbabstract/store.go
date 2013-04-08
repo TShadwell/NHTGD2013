@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
-	D "github.com/TShadwell/nhtgd2013/database"
-	"github.com/TShadwell/nhtgd2013/twfy"
-	"github.com/TShadwell/nhtgd2013/markov"
+	D "github.com/TShadwell/NHTGD2013/database"
+	"github.com/TShadwell/NHTGD2013/markov"
+	"github.com/TShadwell/NHTGD2013/twfy"
 )
 
 var database *D.Database
@@ -58,7 +58,7 @@ func readGobFromKey(k D.Key, i interface{}) error {
 		return e
 	}
 
-	if b == nil{
+	if b == nil {
 		return nil
 	}
 	return gob.NewDecoder(bytes.NewBuffer(b)).Decode(i)
@@ -97,12 +97,12 @@ func storeMembers(ms []twfy.Member) (err error) {
 	StoreChain stores a markov chain corresponding
 	to a member in our K/V store.
 */
-func StoreChain(m markov.Chain, p twfy.PersonID) (err error){
+func StoreChain(m markov.Chain, p twfy.PersonID) (err error) {
 	key, err := dbKey(
 		chains,
 		p,
 	)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 	return writeGobToKey(key, m)
@@ -118,7 +118,7 @@ func RetrieveChain(p twfy.PersonID) (m *markov.Chain, err error) {
 		p,
 	)
 
-	if err != nil{
+	if err != nil {
 		return
 	}
 
