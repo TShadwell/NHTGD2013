@@ -1,7 +1,6 @@
 package level
 
 import (
-	"errors"
 )
 
 /*
@@ -31,9 +30,10 @@ type (
 	}
 	database interface{
 		closer
-		Delete(writeOptions, Key)
-		Put(writeOptions, Key, Value)
-		Write(writeOptions, writeBatch)
+		Delete(writeOptions, Key) error
+		Put(writeOptions, Key, Value) error
+		Write(writeOptions, writeBatch) error
+		Get(readOptions, Key) (Value, error)
 	}
 	writeOptions interface {
 		closer
@@ -64,26 +64,71 @@ func newReadOptions() readOptions
 func newWriteOptions() writeOptions
 func newWriteBatch() writeBatch
 
-//Define the abtstract implimentations of the interfaces.
+//Define the abstract implimentations of the interfaces.
 type (
+	//Database options
 	Options struct{
 		options
 	}
+	//LRU Cache
 	Cache struct{
 		cache
 	}
+	//General write options
 	WriteOptions struct{
 		writeOptions
 	}
+	//General read options
 	ReadOptions struct{
 		readOptions
 	}
+	/*
+		Database represents a levelDB database.
+
+			const location = "database/"
+
+			db := new(Database)
+
+			db.SetCreateIfMissing(
+				true,
+			).SetCacheSize(
+				500 * Megabyte,
+			)
+
+			db.Open(location)
+
+			Alternately:
+
+	*/
 	Database struct{
 		database
 		Cache Cache
-		Options Options
+		Options
 		*ReadOptions
 		*WriteOptions
+	}
+
+	Atom struct{
+		writeBatch
+	}
+	InterfaceAtom struct{
+		*Atom
+	}
+	KeyMarshaler interface{
+		MarshalKey() Key
+	}
+
+	ValueMarshaler interface{
+		MarshalValue() Value
+	}
+
+	KeyValueMarshaler interface{
+		KeyMarshaler
+		ValueMarshaler
+	}
+
+	atom interface{
+		Inner() writeBatch
 	}
 )
 
@@ -198,13 +243,15 @@ func (r *ReadOptions) SetVerifyChecksums(b bool) *ReadOptions{
 	=== Database Functions ===  
 */
 
-func (d *Database) Open(location string) error{
+func (d *Database) Open(location string) (err error){
 	if d.database != nil{
-		return Already_Open
+		err = Already_Open
+		return
 	}
-	dt, err := openDatabase(location, d.Options.Inner())
+	var dt database
+	dt, err = openDatabase(location, d.Options.Inner())
 	d.database = dt
-	return err
+	return
 }
 
 func (d *Database) Close() {
@@ -213,6 +260,62 @@ func (d *Database) Close() {
 	d.Options.Close()
 	d.ReadOptions.Close()
 	d.WriteOptions.Close()
+}
+
+/*
+	Returns the underlying database of the Database.
+	If the database has not been opened, the Not_Open error
+	will be returned.
+*/
+func (d *Database) Inner() (db database, err error){
+	db = d.database
+	if db == nil{
+		err = Not_Opened
+	}
+	return
+}
+
+/*
+	Deletes a single value from the database.
+	For batch deletions, use an Atom.
+*/
+func (d *Database) Delete(k Key) error{
+	db, err := d.Inner()
+	if err != nil{
+		return err
+	}
+	return db.Delete(d.WriteOptions.Inner(), k)
+}
+
+/*
+	Puts a single value into the database.
+	For batch puts, use an Atom.
+*/
+func (d *Database) Put(k Key, v Value) error{
+	db, err := d.Inner()
+	if err != nil{
+		return err
+	}
+	return db.Put(d.WriteOptions.Inner(), k, v)
+}
+
+/*
+	Gets a single value from the database.
+*/
+func (d *Database) Get(k Key) (Value, error){
+	db, err := d.Inner()
+	if err != nil{
+		return nil, err
+	}
+	return db.Get(d.ReadOptions.Inner(), k)
+}
+
+func (d *Database) Write(an atom) error{
+	db, err := d.Inner()
+	if err != nil{
+		return err
+	}
+	return db.Write(d.WriteOptions.Inner(), an.Inner())
 }
 
 func (c *Cache) Close(){
@@ -239,10 +342,58 @@ func (w *WriteOptions) Close() {
 	}
 }
 
+/*
+	Returns the underlying writeBatch of this Atom,
+	creating it if it does not exist.
+*/
+func (a *Atom) Inner() writeBatch{
+	if a.writeBatch == nil{
+		a.writeBatch = newWriteBatch()
+	}
+	return a.writeBatch
+}
 
+func (a *Atom) Clear() *Atom {
+	a.Inner().Clear()
+	return a
+}
 
+func (a *Atom) Close() *Atom {
+	a.Inner().Close()
+	return a
+}
 
+func (a *Atom) Delete(k Key) *Atom {
+	a.Inner().Delete(k)
+	return a
+}
 
-type Atom struct{
-	writeBatch
+func (a *Atom) Put(k Key, v Value) *Atom {
+	a.Inner().Put(k, v)
+	return a
+}
+
+/*
+	Returns an InterfaceAtom that allows more abstracted puts and deletions
+	of values.
+
+	An OOAtom is a reference type.
+*/
+func (a *Atom) Object() InterfaceAtom{
+	return InterfaceAtom{a}
+}
+
+func (o InterfaceAtom) Delete(k KeyMarshaler) InterfaceAtom{
+	o.Atom.Delete(k.MarshalKey())
+	return o
+}
+
+func (o InterfaceAtom) Place(kv KeyValueMarshaler) InterfaceAtom{
+	o.Atom.Put(kv.MarshalKey(), kv.MarshalValue())
+	return o
+}
+
+func (o InterfaceAtom) Put(k KeyMarshaler, v ValueMarshaler) InterfaceAtom{
+	o.Atom.Put(k.MarshalKey(), v.MarshalValue())
+	return o
 }
