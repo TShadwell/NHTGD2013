@@ -94,7 +94,7 @@ type (
 	Database struct{
 		database
 		Cache Cache
-		Options
+		*Options
 		*ReadOptions
 		*WriteOptions
 	}
@@ -122,6 +122,14 @@ type (
 		Inner() writeBatch
 	}
 )
+
+func (v Value) MarshalValue() Value{
+	return v
+}
+
+func (k Key) MarshalKey() Key{
+	return k
+}
 
 /*
 	=== Options Functions ===
@@ -195,6 +203,9 @@ func (c *Cache) Size(b BytesSize) *Cache{
 */
 
 func (w *WriteOptions) Inner() writeOptions{
+	if w == nil{
+		w = new(WriteOptions)
+	}
 	if w.writeOptions == nil{
 		w.writeOptions = newWriteOptions()
 	}
@@ -245,12 +256,25 @@ func (d *Database) Open(location string) (err error){
 	return
 }
 
+
+func (d *Database) OpenDB(location string) (*Database, error){
+	return d, d.Open(location)
+}
+
 func (d *Database) Close() {
 	d.database.Close()
 	d.Cache.Close()
 	d.Options.Close()
 	d.ReadOptions.Close()
 	d.WriteOptions.Close()
+}
+
+func (d *Database) SetOptions(o *Options) *Database{
+	if d.Options != nil{
+		panic("Options already set!")
+	}
+	d.Options = o
+	return d
 }
 
 /*
@@ -307,6 +331,11 @@ func (d *Database) Write(an atom) error{
 		return err
 	}
 	return db.Write(d.WriteOptions.Inner(), an.Inner())
+}
+
+func (d *Database) Commit(an atom) error{
+	defer an.Inner().Close()
+	return d.Write(an)
 }
 
 func (c *Cache) Close(){
