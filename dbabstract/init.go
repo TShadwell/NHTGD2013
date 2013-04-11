@@ -2,30 +2,22 @@ package database
 
 //On init, reload all members
 import (
-	D "github.com/TShadwell/NHTGD2013/database"
+	"github.com/TShadwell/NHTGD2013/database/level"
 	"log"
+	"bitbucket.org/kardianos/osext"
 )
 
 func init() {
-
-	var err error
-	database, err = D.Init()
+	path, err := osext.ExecutableFolder()
+	database, err = new(level.Database).SetOptions(
+		new(level.Options).SetCreateIfMissing(
+			true,
+		).SetCacheSize(
+			500 * level.Megabyte,
+		),
+	).OpenDB(path + "/leveldb/")
 
 	if err != nil {
 		log.Fatal("Error binding database: ", err)
 	}
-	/*
-		API := twfy.API{
-			Key: secrets.TWFYKey,
-		}
-
-		ms, err := API.GetMembers()
-
-		if err != nil {
-			log.Fatal("Error getting members: ", err)
-		}
-
-		err = storeMembers(ms)
-		log.Println("Members stored.")
-	*/
 }
