@@ -1,7 +1,7 @@
 package level
 
-import (
-)
+//Welcome to wrapper central
+
 
 /*
 	A number of bytes, for sizing the LRU cache.
@@ -25,7 +25,7 @@ type (
 	}
 	options interface{
 		SetCreateIfMissing(yes bool)
-		SetLRUCache(cache)
+		SetCache(cache)
 		closer
 	}
 	database interface{
@@ -54,15 +54,6 @@ type (
 	}
 
 )
-
-func newLRUCache(capacity int) cache
-func destroyDatabase(name string, o options) error
-func repairDatabase(name string, o options) error
-func openDatabase(name string, o options) (database, error)
-func newOptions() options
-func newReadOptions() readOptions
-func newWriteOptions() writeOptions
-func newWriteBatch() writeBatch
 
 //Define the abstract implimentations of the interfaces.
 type (
@@ -163,7 +154,7 @@ func (o *Options) SetCreateIfMissing(b bool) *Options{
 	Function SetCache sets the cache object for the database
 */
 func (o *Options) SetCache(c *Cache) *Options{
-	o.Inner().SetLRUCache(c.Inner())
+	o.Inner().SetCache(c.Inner())
 	return o
 }
 
