@@ -1,9 +1,9 @@
 package level
 
 import (
+	"bitbucket.org/kardianos/osext"
 	"bytes"
 	"github.com/TShadwell/go-useful/errors"
-	"bitbucket.org/kardianos/osext"
 	"testing"
 )
 
@@ -16,7 +16,7 @@ var (
 
 func TestDatabase(t *testing.T) {
 	path, err := osext.ExecutableFolder()
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 	db, err := new(Database).SetOptions(

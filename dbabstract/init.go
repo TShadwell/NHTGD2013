@@ -2,9 +2,9 @@ package database
 
 //On init, reload all members
 import (
+	"bitbucket.org/kardianos/osext"
 	"github.com/TShadwell/NHTGD2013/database/level"
 	"log"
-	"bitbucket.org/kardianos/osext"
 )
 
 func init() {
