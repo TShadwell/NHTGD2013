@@ -1,10 +1,6 @@
-// +build ignore
+// +build purego
 
 package level
-
-/*
-	An implimentation must include these functions:
-*/
 
 func newLRUCache(capacity int) cache
 func destroyDatabase(name string, o options) error

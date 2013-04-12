@@ -24,7 +24,6 @@ func (a *API) get(endpoint string, args url.Values) (bytes []byte, err error) {
 			args.Encode(),
 	)
 
-
 	if err != nil {
 		return
 	}
@@ -78,7 +77,7 @@ func (a *API) WriteTexts(w io.Writer, p PersonID) (err error) {
 	}
 	for _, v := range marshalled.Rows {
 		_, err := w.Write(sanitiseTexts(v.Body))
-		if err != nil{
+		if err != nil {
 			return errors.Extend(err)
 		}
 	}
@@ -87,14 +86,14 @@ func (a *API) WriteTexts(w io.Writer, p PersonID) (err error) {
 
 func sanitiseTexts(t string) []byte {
 	return []byte(strings.Trim(
-			html.UnescapeString(
-				tagRemover.ReplaceAllLiteralString(
-					t,
-					"",
-				),
+		html.UnescapeString(
+			tagRemover.ReplaceAllLiteralString(
+				t,
+				"",
 			),
-			" \t",
-		))
+		),
+		" \t",
+	))
 }
 
 func (a *API) GetMembers() (ms []Member, err error) {

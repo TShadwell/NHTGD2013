@@ -7,8 +7,8 @@ const (
 	Not_Opened
 )
 
-func (e Error) Error() (o string){
-	switch e{
+func (e Error) Error() (o string) {
+	switch e {
 	case Already_Open:
 		o = "Database was already open."
 	case Not_Opened:
@@ -16,4 +16,3 @@ func (e Error) Error() (o string){
 	}
 	return
 }
-
