@@ -20,4 +20,5 @@ func init() {
 	if err != nil {
 		log.Fatal("Error binding database: ", err)
 	}
+
 }
