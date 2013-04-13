@@ -3,7 +3,7 @@ package database
 //On init, reload all members
 import (
 	"bitbucket.org/kardianos/osext"
-	"github.com/TShadwell/NHTGD2013/database/level"
+	"github.com/TShadwell/level"
 	"log"
 )
 

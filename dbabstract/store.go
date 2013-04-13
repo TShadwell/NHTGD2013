@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
-	"github.com/TShadwell/NHTGD2013/database/level"
+	"github.com/TShadwell/level"
 	"github.com/TShadwell/NHTGD2013/markov"
 	"github.com/TShadwell/NHTGD2013/twfy"
 )
