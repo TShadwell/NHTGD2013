@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
-	D "github.com/TShadwell/NHTGD2013/database"
+	"github.com/TShadwell/level"
 	"github.com/TShadwell/NHTGD2013/markov"
 	"github.com/TShadwell/NHTGD2013/twfy"
 )
 
-var database *D.Database
+var database *level.Database
 
 var (
 	byteorder = binary.LittleEndian
@@ -29,7 +29,7 @@ const (
 	in order to one large, summed []byte,
 	which is returned for use as a DB key.
 */
-func dbKey(d dbIndex, i ...interface{}) (k D.Key, err error) {
+func dbKey(d dbIndex, i ...interface{}) (k level.Key, err error) {
 	var buf bytes.Buffer
 
 	for _, v := range i {
@@ -44,7 +44,7 @@ func dbKey(d dbIndex, i ...interface{}) (k D.Key, err error) {
 	return
 }
 
-func getFromKey(k D.Key, err error) (D.Value, error) {
+func getFromKey(k level.Key, err error) (level.Value, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func getFromKey(k D.Key, err error) (D.Value, error) {
 	return database.Get(k)
 }
 
-func readGobFromKey(k D.Key, i interface{}) error {
+func readGobFromKey(k level.Key, i interface{}) error {
 	b, e := getFromKey(k, nil)
 	if e != nil {
 		return e
@@ -64,7 +64,7 @@ func readGobFromKey(k D.Key, i interface{}) error {
 	return gob.NewDecoder(bytes.NewBuffer(b)).Decode(i)
 }
 
-func writeGobToKey(k D.Key, i interface{}) (err error) {
+func writeGobToKey(k level.Key, i interface{}) (err error) {
 	var buf bytes.Buffer
 	err = gob.NewEncoder(&buf).Encode(i)
 	if err != nil {
